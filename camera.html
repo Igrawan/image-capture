@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Image Capture</title>
+    <style>
+        #video {
+            width: 300px;
+            height: 200px;
+            border: 1px solid black;
+        }
+        #canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Capturing Your Image Automatically</h1>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+    
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+
+        // Prompt user for permission to access the front webcam
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then(stream => {
+                video.srcObject = stream;
+
+                // Automatically capture the image after the video starts
+                video.addEventListener('loadedmetadata', () => {
+                    // Set canvas size
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // Draw the image on the canvas
+                    context.drawImage(video, 0, 0);
+                    const imageData = canvas.toDataURL('image/png');
+
+                    // Create a link element to download the image
+                    const link = document.createElement('a');
+                    link.href = imageData;
+                    link.download = 'captured_image.png'; // The name of the file to save
+
+                    // Trigger the download
+                    link.click();
+                });
+            })
+            .catch(err => {
+                console.error('Error accessing webcam: ', err);
+            });
+    </script>
+</body>
+</html>
